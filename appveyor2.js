@@ -18,7 +18,7 @@ const errorDetails = (testResult) => {
 const toAppveyorTest = (fileName, ancestorSeparator) => (testResult) => {	
     const [errorMessage, errorStack] = errorDetails(testResult) || [undefined, undefined];	
     return {	
-        testName: testResult.ancestorTitles.join(ancestorSeparator) + " | " + testResult.title,	
+        testName: testResult.ancestorTitles.join(ancestorSeparator) + ancestorSeparator + testResult.title,	
         testFramework: "Jest",	
         fileName: fileName,	
         outcome: testResult.status,	
