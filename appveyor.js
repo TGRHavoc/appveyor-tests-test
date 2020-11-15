@@ -17,6 +17,7 @@ const errorDetails = (testResult) => {
 
 const toAppveyorTest = (fileName, ancestorSeparator) => (testResult) => {
     const [errorMessage, errorStack] = errorDetails(testResult) || [undefined, undefined];
+    console.log(testResult.ancestorTitles.join(ancestorSeparator) + "|" + testResult.title);
     return {
         testName: testResult.ancestorTitles.join(ancestorSeparator) + " | " + testResult.title,
         testFramework: "Jest",
@@ -41,12 +42,13 @@ class AppveyorReporter {
         }
     }
     onTestResult(test, testResult) {
+        console.log(this._options);
         if (!APPVEYOR_API_URL) {
             return;
         }
         console.log("Mapping results and sending to url");
         console.log("URL: "+ APPVEYOR_API_URL + ADD_TESTS_IN_BATCH);
-        const results = testResult.testResults.map(toAppveyorTest(testResult.testFilePath, this._options.ancestorSeparator || " "));
+        const results = testResult.testResults.map(toAppveyorTest(testResult.testFilePath, this._options.ancestorSeparator));
         const json = JSON.stringify(results);
         console.log(json);
         
