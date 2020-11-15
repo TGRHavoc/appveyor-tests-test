@@ -3,7 +3,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */	
 /* eslint-disable @typescript-eslint/explicit-function-return-type */	
 
-const http = require("http");	
+const http = require("http");
+const stripAnsi = require("strip-ansi");
 const APPVEYOR_API_URL = process.env.APPVEYOR_API_URL;	
 const ADD_TESTS_IN_BATCH = "api/tests/batch";	
 const isError = (r) => (r.failureMessages && r.failureMessages.length > 0);	
@@ -22,8 +23,8 @@ const toAppveyorTest = (fileName, ancestorSeparator) => (testResult) => {
         fileName: fileName,	
         outcome: testResult.status,	
         durationMilliseconds: testResult.duration,	
-        ErrorMessage: errorMessage,	
-        ErrorStackTrace: errorStack,	
+        ErrorMessage: stripAnsi(errorMessage),	
+        ErrorStackTrace: stripAnsi(errorStack),	
         StdOut: "",	
         StdErr: ""	
     };	
