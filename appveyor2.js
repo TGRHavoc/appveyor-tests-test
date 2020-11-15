@@ -14,10 +14,10 @@ const errorDetails = (testResult) => {
     const [message, ...stack] = testResult.failureMessages[0].split("\n");	
     return [message, stack.join("\n")];	
 };	
-const toAppveyorTest = (fileName) => (testResult) => {	
+const toAppveyorTest = (fileName, ancestorSeparator) => (testResult) => {	
     const [errorMessage, errorStack] = errorDetails(testResult) || [undefined, undefined];	
     return {	
-        testName: testResult.ancestorTitles.join(">") + " | " + testResult.title,	
+        testName: testResult.ancestorTitles.join(ancestorSeparator) + " | " + testResult.title,	
         testFramework: "Jest",	
         fileName: fileName,	
         outcome: testResult.status,	
@@ -32,12 +32,16 @@ class AppveyorReporter {
     constructor(globalConfig, options) {	
         this._globalConfig = globalConfig;	
         this._options = options;	
+        
+        if(!this._options.ancestorSeparator){
+            this._options.ancestorSeparator = ",";
+        }
     }	
     onTestResult(test, testResult) {	
         if (!APPVEYOR_API_URL) {	
             return;	
         }	
-        const results = testResult.testResults.map(toAppveyorTest(test.path));	
+        const results = testResult.testResults.map(toAppveyorTest(test.path, this._options.ancestorSeparator));	
         const json = JSON.stringify(results);	
         const options = {	
             method: "POST",	
