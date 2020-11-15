@@ -44,8 +44,11 @@ class AppveyorReporter {
         if (!APPVEYOR_API_URL) {
             return;
         }
+        console.log("Mapping results and sending to url");
+        console.log("URL: "+ APPVEYOR_API_URL + ADD_TESTS_IN_BATCH);
         const results = testResult.testResults.map(toAppveyorTest(testResult.testFilePath, this._options.ancestorSeparator || " "));
         const json = JSON.stringify(results);
+        console.log(json);
         
         axios.post(APPVEYOR_API_URL +  ADD_TESTS_IN_BATCH, json)
             .then((res) => {

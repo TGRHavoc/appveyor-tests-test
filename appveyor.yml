@@ -1,0 +1,14 @@
+version: 1.0.{build}
+skip_tags: true
+environment:
+  GITHUB_TOKEN:
+    secure: 0jn1g9xBfl+6FfOx9tBMWKAf/dPbWZM2ICYkMgeUeWp6186VxVXC4hO5ASpkz5+t
+  GIT_AUTHOR_NAME: Jordan Dalton (CI)
+  GIT_AUTHOR_EMAIL: jordan.8474@gmail.com
+  GIT_COMMITTER_NAME: Jordan Dalton (CI)
+  GIT_COMMITTER_EMAIL: jordan.8474@gmail.com
+install:
+- sh: npm ci
+test_script:
+- pwsh: npm run test
+...
