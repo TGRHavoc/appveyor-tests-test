@@ -2,7 +2,7 @@ module.exports = {
     testEnvironment: "node",
     reporters: [
         "default",
-        ["./appveyor.js", {
+        ["./appveyor2.js", {
             ancestorSeparator: " › "
         }]
     ]
