@@ -17,13 +17,12 @@ const errorDetails = (testResult) => {
 };	
 const toAppveyorTest = (fileName, ancestorSeparator) => (testResult) => {	
     const [errorMessage, errorStack] = errorDetails(testResult) || [undefined, undefined];	
-    console.log("Seperator: "+ ancestorSeparator);
     return {	
-        testName: testResult.ancestorTitles.join(ancestorSeparator) + " | " + testResult.title,	
+        testName: testResult.ancestorTitles.join(ancestorSeparator) + " | " + (testResult.title || "No title"),	
         testFramework: "Jest",	
-        fileName: fileName,	
-        outcome: testResult.status,	
-        durationMilliseconds: testResult.duration,	
+        fileName: (fileName || "unknown file"),	
+        outcome: (testResult.status || "NotFound"),	
+        durationMilliseconds: testResult.duration/1000,	
         ErrorMessage: stripAnsi(errorMessage),	
         ErrorStackTrace: stripAnsi(errorStack),	
         StdOut: "",	
@@ -40,22 +39,30 @@ class AppveyorReporter {
         }
     }	
     onTestResult(test, testResult) {	
+        console.log("onTestResult");
         if (!APPVEYOR_API_URL) {	
+            console.error("No API URL!!");
             return;	
         }	
-        const results = testResult.testResults.map(toAppveyorTest(test.path, this._options.ancestorSeparator));	
-        const json = JSON.stringify(results);	
-        const options = {	
-            method: "POST",	
-            headers: {	
-                "Content-Type": "application/json",	
-                "Content-Length": json.length	
-            }	
-        };	
-        const req = http.request(APPVEYOR_API_URL + ADD_TESTS_IN_BATCH, options);	
-        req.on("error", (error) => console.error("Unable to post test result", { error }));	
-        req.write(json);	
-        req.end();	
+        try{
+            const results = testResult.testResults.map(toAppveyorTest(test.path, this._options.ancestorSeparator));	
+            const json = JSON.stringify(results);	
+            const options = {	
+                method: "POST",	
+                headers: {	
+                    "Content-Type": "application/json",	
+                    "Content-Length": json.length	
+                }	
+            };
+            const req = http.request(APPVEYOR_API_URL + ADD_TESTS_IN_BATCH, options);
+            console.log("Sending request...");	
+            req.on("error", (error) => console.error("Unable to post test result", { error }));	
+            req.write(json);	
+            req.end();	
+        }catch(e){
+            console.error("Couldn't send request");
+            console.error(e);
+        }
     }	
 }	
 module.exports = AppveyorReporter;	
