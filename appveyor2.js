@@ -44,19 +44,20 @@ class AppveyorReporter {
         }	
         try{
             const results = testResult.testResults.map(toAppveyorTest(test.path, this._options.ancestorSeparator));	
+
+            const options = {	
+                    method: "POST",	
+                    headers: {	
+                        "Content-Type": "application/json"
+                    }
+                };
             const req = http.request(APPVEYOR_API_URL + ADD_TESTS_IN_BATCH, options);
 
             let offset = 0;
             do{
                 const json = JSON.stringify(results.splice(offset, 10));
                 console.log("POSTING: ", json);
-                const options = {	
-                    method: "POST",	
-                    headers: {	
-                        "Content-Type": "application/json",	
-                        "Content-Length": json.length	
-                    }
-                };
+                
                 console.log("Sending request... " + ( offset == 0 ? 0 : offset / 10));	
                 req.on("error", (error) => console.error("Unable to post test result", { error }));	
                 req.write(json);
