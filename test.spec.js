@@ -1,5 +1,5 @@
 describe("Test", function(){
-    for(var i = 0; i < 300; i++){
+    for(var i = 0; i < 100; i++){
         it("test " + i, () => expect(true).toBe(true));
     }
 });
