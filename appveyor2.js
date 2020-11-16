@@ -46,7 +46,7 @@ class AppveyorReporter {
             const results = testResult.testResults.map(toAppveyorTest(test.path, this._options.ancestorSeparator));	
 
             results.forEach(r => {
-                const json = JSON.stringify(results.splice(offset, 10));
+                const json = JSON.stringify(r);
                 console.log("POSTING: ", json);
                 const options = {	
                     method: "POST",	
