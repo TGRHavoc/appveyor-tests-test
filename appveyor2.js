@@ -39,26 +39,30 @@ class AppveyorReporter {
         }
     }	
     onTestResult(test, testResult) {	
-        console.log("onTestResult");
         if (!APPVEYOR_API_URL) {	
-            console.error("No API URL!!");
             return;	
         }	
         try{
             const results = testResult.testResults.map(toAppveyorTest(test.path, this._options.ancestorSeparator));	
-            const json = JSON.stringify(results);	
-            const options = {	
-                method: "POST",	
-                headers: {	
-                    "Content-Type": "application/json",	
-                    "Content-Length": json.length	
-                }	
-            };
-            const req = http.request(APPVEYOR_API_URL + ADD_TESTS_IN_BATCH, options);
-            console.log("Sending request...");	
-            req.on("error", (error) => console.error("Unable to post test result", { error }));	
-            req.write(json);	
-            req.end();	
+
+            let offset = 0;
+            do{
+                const json = JSON.stringify(results.splice(offset, 10));
+                const options = {	
+                    method: "POST",	
+                    headers: {	
+                        "Content-Type": "application/json",	
+                        "Content-Length": json.length	
+                    }
+                };
+                const req = http.request(APPVEYOR_API_URL + ADD_TESTS_IN_BATCH, options);
+                console.log("Sending request...");	
+                req.on("error", (error) => console.error("Unable to post test result", { error }));	
+                req.write(json);
+                req.end();	
+                offset+= 10;
+            }while(results.length >= 10);
+
         }catch(e){
             console.error("Couldn't send request");
             console.error(e);
